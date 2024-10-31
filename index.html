@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Glitch Art Generator</title>
+    <style>
+        canvas {
+            border: 1px solid #333;
+            max-height: 90vh;
+            width: auto;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #1a1a1a;
+            padding: 20px;
+        }
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            background: #333;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="glitchCanvas" width="800" height="1200"></canvas>
+    <script>
+        const canvas = document.getElementById('glitchCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function generateGlitch() {
+            // Dark night sky background with subtle gradient
+            const skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            skyGradient.addColorStop(0, '#0A0A1A');
+            skyGradient.addColorStop(1, '#1A1A2A');
+            ctx.fillStyle = skyGradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Random chance for moon (10%)
+            if (Math.random() < 1) {
+                const moonX = canvas.width * (0.2 + Math.random() * 0.6);
+                const moonY = canvas.height * (0.1 + Math.random() * 0.2);
+                const moonSize = canvas.width * (0.1 + Math.random() * 0.1);
+                
+                // Draw moon
+                ctx.beginPath();
+                ctx.arc(moonX, moonY, moonSize, 0, Math.PI * 2);
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fill();
+                
+                // Add glitch effects to moon (50% chance)
+                if (Math.random() > 0.5) {
+                    const offset = moonSize * 0.1;
+                    ctx.fillStyle = '#000000';
+                    ctx.fillRect(moonX - moonSize/2, moonY - offset, moonSize, offset * 2);
+                    
+                    // Duplicate part of the moon with offset
+                    const moonData = ctx.getImageData(moonX - moonSize/2, moonY - moonSize/2, moonSize, moonSize);
+                    ctx.putImageData(moonData, moonX - moonSize/2 + (Math.random() * 20 - 10), moonY - moonSize/2);
+                }
+            }
+
+            // Generate stars with occasional glitch
+            for (let i = 0; i < 200; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const size = Math.random() * 2;
+                
+                // Occasional glitched star
+                if (Math.random() > 0.9) {
+                    ctx.fillStyle = Math.random() > 0.5 ? '#FFFFFF' : '#000000';
+                    ctx.fillRect(x, y, size + 5, size + Math.random() * 10);
+                } else {
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillRect(x, y, size, size);
+                }
+            }
+
+            // Generate desert dunes
+            const numDunes = 7 + Math.floor(Math.random() * 4);  // Random number of dunes (7-10)
+            const baseFrequency = 0.002 + Math.random() * 0.002; // Random base frequency
+            const duneHeight = 50 + Math.random() * 30;          // Random height multiplier
+            
+            for (let i = 0; i < numDunes; i++) {
+                const startY = canvas.height - (280 - i * 40);
+                ctx.beginPath();
+                ctx.moveTo(-100, startY);
+                
+                let prevY = startY;
+                // Generate random frequencies for this dune
+                const freq1 = baseFrequency * (0.8 + Math.random() * 0.4);
+                const freq2 = freq1 * (8 + Math.random() * 4);
+                const freq3 = freq1 * (2 + Math.random() * 2);
+                
+                for (let x = -100; x <= canvas.width + 100; x += 15) {
+                    const offset = 
+                        Math.sin(x * freq1 + i * 0.7) * duneHeight +    // Large curves
+                        Math.sin(x * freq2 + i * 0.2) * (10 + Math.random() * 5) +   // Details
+                        Math.cos(x * freq3 + i * 0.5) * (20 + Math.random() * 10) +  // Medium variations
+                        (Math.random() * 3);  // Subtle noise
+                    
+                    const y = startY + offset;
+                    prevY = y * 0.2 + prevY * 0.8;
+                    ctx.lineTo(x, prevY);
+                }
+                
+                ctx.lineTo(canvas.width + 100, canvas.height);
+                ctx.lineTo(-100, canvas.height);
+                ctx.closePath();
+                
+                // Randomized warm colors
+                const baseColor = 20 + i * 10;
+                const warmth = Math.sin(i * 0.8) * (10 + Math.random() * 5);
+                const colorVariation = Math.random() * 10;
+                ctx.fillStyle = `rgb(
+                    ${baseColor + warmth + 15 + colorVariation}, 
+                    ${baseColor + warmth - 5 + colorVariation * 0.5}, 
+                    ${baseColor + Math.max(0, warmth - 15) + colorVariation * 0.3}
+                )`;
+                ctx.fill();
+            }
+
+            // Add film grain effect
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            for (let i = 0; i < data.length; i += 4) {
+                const grainAmount = Math.random() * 20 - 10;
+                data[i] = Math.min(255, Math.max(0, data[i] + grainAmount));     // Red
+                data[i+1] = Math.min(255, Math.max(0, data[i+1] + grainAmount)); // Green
+                data[i+2] = Math.min(255, Math.max(0, data[i+2] + grainAmount)); // Blue
+            }
+            ctx.putImageData(imageData, 0, 0);
+
+            // Add some artistic horizontal bands
+            for (let i = 0; i < 8; i++) {
+                const y = Math.random() * canvas.height;
+                const height = Math.random() * 30 + 10;
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+                ctx.fillRect(0, y, canvas.width, height);
+            }
+
+            // Add some subtle vignette effect
+            const vignetteGradient = ctx.createRadialGradient(
+                canvas.width/2, canvas.height/2, 0,
+                canvas.width/2, canvas.height/2, canvas.width
+            );
+            vignetteGradient.addColorStop(0, 'rgba(0,0,0,0)');
+            vignetteGradient.addColorStop(1, 'rgba(0,0,0,0.4)');
+            ctx.fillStyle = vignetteGradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Add some more dramatic glitch effects
+            for (let i = 0; i < 5; i++) {
+                const y = Math.random() * canvas.height;
+                const height = Math.random() * 50 + 20;
+                const offset = Math.random() * 20 - 10;
+                
+                // Create glitch slice
+                const imageData = ctx.getImageData(0, y, canvas.width, height);
+                ctx.putImageData(imageData, offset, y);
+                
+                // Add some contrast to the glitch
+                ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+                ctx.fillRect(0, y, canvas.width, height);
+            }
+
+            // Add some subtle scan lines
+            for (let y = 0; y < canvas.height; y += 2) {
+                ctx.fillStyle = 'rgba(0,0,0,0.02)';
+                ctx.fillRect(0, y, canvas.width, 1);
+            }
+
+
+            // Add a white border
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.lineWidth = 50;
+            ctx.strokeRect(0, 0, canvas.width, canvas.height);
+
+            // Write the word "yungwknd" in the bottom right corner
+            ctx.fillStyle = '#000000';
+            // Monospace font
+            ctx.font = '20px monospace';
+
+            ctx.fillText('yungwknd', canvas.width - 120, canvas.height - 7);
+
+            ctx.fillText('marfa', 25, canvas.height - 7);
+        }
+
+        // Generate initial art
+        generateGlitch();
+    </script>
+</body>
+</html>
