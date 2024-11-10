@@ -26,7 +26,7 @@
     </style>
 </head>
 <body>
-    <canvas id="glitchCanvas" width="800" height="1200"></canvas>
+    <canvas id="glitchCanvas" width="4000" height="6000"></canvas>
     <script>
         const canvas = document.getElementById('glitchCanvas');
         const ctx = canvas.getContext('2d');
@@ -43,7 +43,7 @@
             if (Math.random() < 1) {
                 const moonX = canvas.width * (0.2 + Math.random() * 0.6);
                 const moonY = canvas.height * (0.1 + Math.random() * 0.2);
-                const moonSize = canvas.width * (0.1 + Math.random() * 0.1);
+                const moonSize = canvas.width * (0.05 + Math.random() * 0.05);
                 
                 // Draw moon
                 ctx.beginPath();
@@ -64,15 +64,15 @@
             }
 
             // Generate stars with occasional glitch
-            for (let i = 0; i < 200; i++) {
+            for (let i = 0; i < 1000; i++) {
                 const x = Math.random() * canvas.width;
                 const y = Math.random() * canvas.height;
-                const size = Math.random() * 2;
+                const size = Math.random() * 4;
                 
                 // Occasional glitched star
                 if (Math.random() > 0.9) {
                     ctx.fillStyle = Math.random() > 0.5 ? '#FFFFFF' : '#000000';
-                    ctx.fillRect(x, y, size + 5, size + Math.random() * 10);
+                    ctx.fillRect(x, y, size + 15, size + Math.random() * 30);
                 } else {
                     ctx.fillStyle = '#FFFFFF';
                     ctx.fillRect(x, y, size, size);
@@ -81,11 +81,11 @@
 
             // Generate desert dunes
             const numDunes = 7 + Math.floor(Math.random() * 4);  // Random number of dunes (7-10)
-            const baseFrequency = 0.002 + Math.random() * 0.002; // Random base frequency
-            const duneHeight = 50 + Math.random() * 30;          // Random height multiplier
+            const baseFrequency = 0.0004 + Math.random() * 0.0004; // Random base frequency
+            const duneHeight = 250 + Math.random() * 150;          // Random height multiplier
             
             for (let i = 0; i < numDunes; i++) {
-                const startY = canvas.height - (280 - i * 40);
+                const startY = canvas.height - (1400 - i * 200);
                 ctx.beginPath();
                 ctx.moveTo(-100, startY);
                 
@@ -137,7 +137,7 @@
             // Add some artistic horizontal bands
             for (let i = 0; i < 8; i++) {
                 const y = Math.random() * canvas.height;
-                const height = Math.random() * 30 + 10;
+                const height = Math.random() * 150 + 50;
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
                 ctx.fillRect(0, y, canvas.width, height);
             }
@@ -155,8 +155,8 @@
             // Add some more dramatic glitch effects
             for (let i = 0; i < 5; i++) {
                 const y = Math.random() * canvas.height;
-                const height = Math.random() * 50 + 20;
-                const offset = Math.random() * 20 - 10;
+                const height = Math.random() * 250 + 100;
+                const offset = Math.random() * 100 - 50;
                 
                 // Create glitch slice
                 const imageData = ctx.getImageData(0, y, canvas.width, height);
@@ -176,17 +176,17 @@
 
             // Add a white border
             ctx.strokeStyle = '#FFFFFF';
-            ctx.lineWidth = 50;
+            ctx.lineWidth = 250;
             ctx.strokeRect(0, 0, canvas.width, canvas.height);
 
             // Write the word "yungwknd" in the bottom right corner
             ctx.fillStyle = '#000000';
             // Monospace font
-            ctx.font = '20px monospace';
+            ctx.font = '100px monospace';
 
-            ctx.fillText('yungwknd', canvas.width - 120, canvas.height - 7);
+            ctx.fillText('yungwknd', canvas.width - 600, canvas.height - 35);
 
-            ctx.fillText('marfa', 25, canvas.height - 7);
+            ctx.fillText('marfa', 125, canvas.height - 35);
         }
 
         // Generate initial art
